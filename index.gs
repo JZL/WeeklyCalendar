@@ -1,4 +1,6 @@
 //random font for days
+//https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyCU6bm3mMmZQCn-cbuHa1wzZAu7oh7OlT0
+//https://developers.google.com/fonts/docs/developer_api
 var msInDay = 24*60*60*1000
 var newLines = "\n\n\n\n\n\n\n\n\n\n"
 var hourTable = [[8,""],[9,""],[10,""],[11,""],[12,""],[1,""],[2,""],[3,""],[4,""],[5,""],[6,""],[7,""],[8,""]]
@@ -7,6 +9,7 @@ var longestLength=16
   //    [[start, end], "spaces"]
 var boldArr = [[/A/g, "𝐀"],[/B/g, "𝐁"],[/C/g, "𝐂"],[/D/g, "𝐃"],[/E/g, "𝐄"],[/F/g, "𝐅"],[/G/g, "𝐆"],[/H/g, "𝐇"],[/I/g, "𝐈"],[/J/g, "𝐉"],[/K/g, "𝐊"],[/L/g, "𝐋"],[/M/g, "𝐌"],[/N/g, "𝐍"],[/O/g, "𝐎"],[/P/g, "𝐏"],[/Q/g, "𝐐"],[/R/g, "𝐑"],[/S/g, "𝐒"],[/T/g, "𝐓"],[/U/g, "𝐔"],[/V/g, "𝐕"],[/W/g, "𝐖"],[/X/g, "𝐗"],[/Y/g, "𝐘"],[/Z/g, "𝐙"],[/a/g, "𝐚"],[/b/g, "𝐛"],[/c/g, "𝐜"],[/d/g, "𝐝"],[/e/g, "𝐞"],[/f/g, "𝐟"],[/g/g, "𝐠"],[/h/g, "𝐡"],[/i/g, "𝐢"],[/j/g, "𝐣"],[/k/g, "𝐤"],[/l/g, "𝐥"],[/m/g, "𝐦"],[/n/g, "𝐧"],[/o/g, "𝐨"],[/p/g, "𝐩"],[/q/g, "𝐪"],[/r/g, "𝐫"],[/s/g, "𝐬"],[/t/g, "𝐭"],[/u/g, "𝐮"],[/v/g, "𝐯"],[/w/g, "𝐰"],[/x/g, "𝐱"],[/y/g, "𝐲"],[/z/g, "𝐳"]]
 function doAll(emailNow){
+  try{
   var document = DocumentApp.openById("1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU")
   var body = document.getBody().clear()
   body.setMarginTop(0)
@@ -15,7 +18,7 @@ function doAll(emailNow){
   body.setMarginLeft(0)
   body.setMarginRight(0)
   //resets font size  
-  body.getChild(0).asText().setFontSize(11)
+  body.getChild(0).asText().setFontSize(11)//.setFontFamily(getRandomFont())
 //  var thisMonday = getMonday(new Date())
   var thisMonday = getMonday(new Date("10/9/2016"))
   //true means want to NOT minimize size
@@ -23,7 +26,7 @@ function doAll(emailNow){
   body.appendPageBreak()
   body.appendParagraph("")
   body.getChild(0).asText().setFontSize(0)
-//  makePaper(getMonday(new Date(thisMonday.getTime()+6*msInDay)), body, true)
+  makePaper(getMonday(new Date(thisMonday.getTime()+6*msInDay)), body, true)
   
   Utilities.sleep(1000)
   if(emailNow == false){
@@ -36,6 +39,9 @@ function doAll(emailNow){
     });
   }
   //   MailApp.sendEmail("jlangli1@swarthmore.edu", "New Weekly Calendar", "https://docs.google.com/document/d/1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU/edit \n https://docs.google.com/a/swarthmore.edu/document/export?format=pdf&id=1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU")
+  }catch(e){
+    MailApp.sendEmail("jonahmail1@gmail.com", "Problem with weeklyCal", e)
+  }
 }
 
 function runWeekly(){
@@ -67,10 +73,11 @@ function makePaper(startDate, body, minimizeSize) {
   
   a = body.appendTable([["Mon "+getDateString(startDate), "Tue "+getDateString(new Date(startDateTime+msInDay))], ["Wed "+getDateString(new Date(startDateTime+2*msInDay)), "Thur "+getDateString(new Date(startDateTime+3*msInDay))], ["Fri "+getDateString(new Date(startDateTime+4*msInDay)), "Sat "+getDateString(new Date(startDateTime+5*msInDay))]])
   .setBorderColor("#D3D3D3")
+  
  
   if(minimizeSize){
-//    a.setBorderColor("#000000");
-    a.setBorderColor("#D3D3D3");
+    a.setBorderColor("#000000");
+//    a.setBorderColor("#D3D3D3");
   }else{
     a.setBorderColor("#D3D3D3")
   }
@@ -182,7 +189,7 @@ function makePaper(startDate, body, minimizeSize) {
     }
     
   }
- Logger.log(JSON.stringify(noSpacesweeksObj))
+// Logger.log(JSON.stringify(noSpacesweeksObj))
   for(var i in noSpacesweeksObj){
     var dayStart = i
     for(var z = 0; z<=23;z++){
@@ -220,9 +227,9 @@ function makePaper(startDate, body, minimizeSize) {
       }
     }
   }
-  Logger.log("-----------")
-  Logger.log("-----------")
-  Logger.log(JSON.stringify(weeksObj))
+//  Logger.log("-----------")
+//  Logger.log("-----------")
+//  Logger.log(JSON.stringify(weeksObj))
   
   
   
@@ -231,9 +238,10 @@ function makePaper(startDate, body, minimizeSize) {
   
   style[DocumentApp.Attribute.FONT_SIZE] = 6;
 //  style[DocumentApp.Attribute.FONT_FAMILY] = 'Courier New';
-  style[DocumentApp.Attribute.FONT_FAMILY] = 'Roboto Mono';
-//  style[DocumentApp.Attribute.BORDER_COLOR] = '#FFFFFF';
-  style[DocumentApp.Attribute.BORDER_COLOR] = '#000000';
+//  style[DocumentApp.Attribute.FONT_FAMILY] = 'Roboto Mono';
+  style[DocumentApp.Attribute.FONT_FAMILY] = 'Droid Sans Mono';
+  style[DocumentApp.Attribute.BORDER_COLOR] = '#FFFFFF';
+//  style[DocumentApp.Attribute.BORDER_COLOR] = '#000000';
   
   for(var i=0; i<=4;i++){
 
@@ -349,11 +357,22 @@ function makePaper(startDate, body, minimizeSize) {
     }
   }
   
+  var randFontsArr = getRandomFonts(9)
+  Logger.log("FONTS "+ JSON.stringify(randFontsArr))
+  a.getCell(0, 0).getChild(0).asText().setFontFamily(randFontsArr[0])
+  a.getCell(0, 1).getChild(0).asText().setFontFamily(randFontsArr[1])
+  a.getCell(1, 0).getChild(0).asText().setFontFamily(randFontsArr[2])
+  a.getCell(1, 1).getChild(0).asText().setFontFamily(randFontsArr[3])
+  a.getCell(2, 0).getChild(0).asText().setFontFamily(randFontsArr[4])
+  a.getCell(2, 1).getChild(0).asText().setFontFamily(randFontsArr[5])
+  a.getCell(0, 0).getChild(0).asText().setFontFamily(randFontsArr[6])
   a.getCell(2,1).appendParagraph(satText).setAttributes(style)
   .appendHorizontalRule()
   
-  a.getCell(2,1).appendParagraph("Sun "+getDateString(new Date(startDateTime+6*msInDay))).setAlignment(DocumentApp.HorizontalAlignment.CENTER).editAsText().setFontSize(11).setFontFamily("Arial")
+  a.getCell(2,1).appendParagraph("Sun "+getDateString(new Date(startDateTime+6*msInDay))).setAlignment(DocumentApp.HorizontalAlignment.CENTER).editAsText().setFontSize(11).setFontFamily(randFontsArr[7])
   a.getCell(2,1).appendParagraph(sunText).setAttributes(style)
+  
+//  a.getCell(0, 0).getChild(0).asText().setFontFamily(getRandomFont())
   
   //  a.getCell(2, 1).appendHorizontalRule()
   //  a.getCell(2,1).appendParagraph("Sun "+getDateString(new Date(startDateTime+6*msInDay))).setAlignment(DocumentApp.HorizontalAlignment.CENTER)
@@ -379,8 +398,8 @@ function makePaper(startDate, body, minimizeSize) {
   //  .setBorderColor("#FFFFFF")
   //  .getRow(0).getCell(0).setWidth(553).getChild(0).asParagraph().setAlignment(DocumentApp.HorizontalAlignment.CENTER)
   
-  body.appendParagraph("ToDo").setAlignment(DocumentApp.HorizontalAlignment.CENTER).setSpacingBefore(0)
-  body.appendParagraph("Add Dates").setAlignment(DocumentApp.HorizontalAlignment.RIGHT)
+  body.appendParagraph("ToDo").setAlignment(DocumentApp.HorizontalAlignment.CENTER).setSpacingBefore(0).editAsText().setFontFamily(randFontsArr[8])
+  body.appendParagraph("Add Dates").setAlignment(DocumentApp.HorizontalAlignment.RIGHT).editAsText().setFontFamily(randFontsArr[9])
   
   
 }
@@ -478,4 +497,17 @@ function compareToSpace(a,b){
 
 function compareSecondElem(a, b){
   return (a[1]).localeCompare(b[1]);
+}
+function testt(){
+  Logger.log(getRandomFont())
+}
+function getRandomFonts(numFonts){
+  var resp = UrlFetchApp.fetch("https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyCU6bm3mMmZQCn-cbuHa1wzZAu7oh7OlT0").getContentText()
+    var allFonts = JSON.parse(resp).items
+    var retFonts = []
+    for(var i = 0; i<=numFonts;i++){
+      retFonts.push(allFonts[Math.floor(Math.random()*allFonts.length)].family)
+    }
+    return retFonts
+  
 }
