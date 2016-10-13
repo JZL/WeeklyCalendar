@@ -1,3 +1,6 @@
+//sunday add spaces for nested dates
+//!! doesn't truncate
+//next days add bolded/etc (3d printing)s
 //random font for days
 //https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyCU6bm3mMmZQCn-cbuHa1wzZAu7oh7OlT0
 //https://developers.google.com/fonts/docs/developer_api
@@ -9,7 +12,7 @@ var longestLength=16
   //    [[start, end], "spaces"]
 var boldArr = [[/A/g, "𝐀"],[/B/g, "𝐁"],[/C/g, "𝐂"],[/D/g, "𝐃"],[/E/g, "𝐄"],[/F/g, "𝐅"],[/G/g, "𝐆"],[/H/g, "𝐇"],[/I/g, "𝐈"],[/J/g, "𝐉"],[/K/g, "𝐊"],[/L/g, "𝐋"],[/M/g, "𝐌"],[/N/g, "𝐍"],[/O/g, "𝐎"],[/P/g, "𝐏"],[/Q/g, "𝐐"],[/R/g, "𝐑"],[/S/g, "𝐒"],[/T/g, "𝐓"],[/U/g, "𝐔"],[/V/g, "𝐕"],[/W/g, "𝐖"],[/X/g, "𝐗"],[/Y/g, "𝐘"],[/Z/g, "𝐙"],[/a/g, "𝐚"],[/b/g, "𝐛"],[/c/g, "𝐜"],[/d/g, "𝐝"],[/e/g, "𝐞"],[/f/g, "𝐟"],[/g/g, "𝐠"],[/h/g, "𝐡"],[/i/g, "𝐢"],[/j/g, "𝐣"],[/k/g, "𝐤"],[/l/g, "𝐥"],[/m/g, "𝐦"],[/n/g, "𝐧"],[/o/g, "𝐨"],[/p/g, "𝐩"],[/q/g, "𝐪"],[/r/g, "𝐫"],[/s/g, "𝐬"],[/t/g, "𝐭"],[/u/g, "𝐮"],[/v/g, "𝐯"],[/w/g, "𝐰"],[/x/g, "𝐱"],[/y/g, "𝐲"],[/z/g, "𝐳"]]
 function doAll(emailNow){
-  try{
+//  try{
   var document = DocumentApp.openById("1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU")
   var body = document.getBody().clear()
   body.setMarginTop(0)
@@ -39,9 +42,9 @@ function doAll(emailNow){
     });
   }
   //   MailApp.sendEmail("jlangli1@swarthmore.edu", "New Weekly Calendar", "https://docs.google.com/document/d/1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU/edit \n https://docs.google.com/a/swarthmore.edu/document/export?format=pdf&id=1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU")
-  }catch(e){
-    MailApp.sendEmail("jonahmail1@gmail.com", "Problem with weeklyCal", e)
-  }
+//  }catch(e){
+//    MailApp.sendEmail("jonahmail1@gmail.com", "Problem with weeklyCal", e)
+//  }
 }
 
 function runWeekly(){
@@ -98,16 +101,18 @@ function makePaper(startDate, body, minimizeSize) {
   var noSpacesweeksObj = {}
   var weeksObj = {}
   var spacesObj = {}
+  var hoursTaken = {}
   
   for(var i = 0; i<=6;i++){
     noSpacesweeksObj[startDateTime+msInDay*i] = {"DUE": [], "TODO":[],"allDay": [], "0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[],"13":[],"14":[],"15":[],"16":[],"17":[],"18":[],"19":[],"20":[],"21":[],"22":[],"23":[]}
     weeksObj[startDateTime+msInDay*i] = {"BOLD": [], "DUE": [], "TODO":[],"allDay": [], "0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[],"13":[],"14":[],"15":[],"16":[],"17":[],"18":[],"19":[],"20":[],"21":[],"22":[],"23":[]}
+    hoursTaken[startDateTime+msInDay*i] = {"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[],"13":[],"14":[],"15":[],"16":[],"17":[],"18":[],"19":[],"20":[],"21":[],"22":[],"23":[]}
 //    spacesObj[startDateTime+msInDay*i] = {"0":"","1":"","2":"","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":""}
   }
   for(var z = 0; z<allCals.length;z++){
     allCals[z] = CalendarApp.getCalendarById(allCals[z])
     //    var allDays = CalendarApp.getCalendarById("jlangli1@swarthmore.edu").getEvents(startDate, new Date(startDateTime+13*msInDay))
-    var allDays = allCals[z].getEvents(startDate, new Date(startDateTime+6*msInDay))
+    var allDays = allCals[z].getEvents(startDate, new Date(startDateTime+7*msInDay))
     Logger.log(allDays)
     for(var i in allDays){
       if(allDays[i].isAllDayEvent()){
@@ -169,6 +174,9 @@ function makePaper(startDate, body, minimizeSize) {
           */
           //last is true if want to be bold
         noSpacesweeksObj[dayStart][eventStartTime.getHours()].push([[eventStartTime, eventEndTime], truncate(allDays[i].getTitle(), longestLength), z==0])
+        //for use to decide if empty hour for " |"
+        hoursTaken[dayStart][eventStartTime.getHours()].push("")
+        hoursTaken[dayEnd][eventEndTime.getHours()].push("")
         if(z==1){
           weeksObj[dayStart].TODO.push(eventStartTime.getHours()+((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+truncate(allDays[i].getTitle(), longestLength))
         }else if(z == 2){
@@ -193,6 +201,7 @@ function makePaper(startDate, body, minimizeSize) {
   for(var i in noSpacesweeksObj){
     var dayStart = i
     for(var z = 0; z<=23;z++){
+
       for(var p =0; p<noSpacesweeksObj[i][z].length;p++){
         noSpacesweeksObj[i][z] = noSpacesweeksObj[i][z].sort(compareSecondElem)
         eventStartTime = noSpacesweeksObj[i][z][p][0][0]
@@ -224,8 +233,19 @@ function makePaper(startDate, body, minimizeSize) {
           weeksObj[i].BOLD.push([z, weeksObj[i][z].length-1])
           weeksObj[i].BOLD.push([eventEndTime.getHours(), weeksObj[i][eventEndTime.getHours()].length-1])
         }
+        for(var e = eventStartTime.getHours()+1; e<eventEndTime.getHours();e++){
+          if(hoursTaken[i][e].length == 0){
+            weeksObj[i][e].push("  |")
+            hoursTaken[i][e].push("|")
+          }
+        }
       }
     }
+//    for(var z = 0; z<=23;z++){
+//      if(weeksObj[i][z].length >1  && weeksObj[i][z][0] == " |" ){
+//        weeksObj[i][z].splice(0,1)
+//      }
+//    }
   }
 //  Logger.log("-----------")
 //  Logger.log("-----------")
@@ -318,8 +338,8 @@ function makePaper(startDate, body, minimizeSize) {
       for(var q in thisDayObj){
         if(thisDayObj[q]!=""){
           numLines++
-            todaysTimes+=armyToNormalTime(q)+thisDayObj[q]//.sort(compareToSpace)
-            .join("\n"+armyToNormalTime(q)).replace(/\$/g, "")+"\n"
+            todaysTimes+=armyToNormalTime(q, true)+thisDayObj[q]//.sort(compareToSpace)
+            .join("\n"+armyToNormalTime(q, true)).replace(/\$/g, "")+"\n"
         }
       }
       for(var z =numLines; z<8; z++){
@@ -428,7 +448,7 @@ function getDateString(d){
   return d.getMonth()+1+"/"+d.getDate()
 }
 
-function armyToNormalTime(hour){
+function armyToNormalTime(hour, padNums){
   if(hour == "allDay"){
     return ""
   }else if(isNaN(hour) == true){
@@ -437,7 +457,11 @@ function armyToNormalTime(hour){
   if(hour == 12){
     return 12
   }else{
+    if(padNums){
+      return pad(hour%12, 2, " ")
+    }else{
     return hour%12
+    }
   }
 }
 //var hourTable = []
@@ -510,4 +534,10 @@ function getRandomFonts(numFonts){
     }
     return retFonts
   
+}
+
+function pad(n, width, z) {
+  z = z || '0';
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
