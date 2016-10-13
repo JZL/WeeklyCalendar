@@ -88,10 +88,12 @@ function makePaper(startDate, body, minimizeSize) {
   //keep order of first 3
   var allCals = ["swarthmore.edu_dop0bh53409lheq23ell6ignqk@group.calendar.google.com", "swarthmore.edu_d4fd5qnh3r5a7aqdc2hk9fk5ag@group.calendar.google.com", "swarthmore.edu_ji5sie4fh0ddijtuithbqdse28@group.calendar.google.com", "swarthmore.edu_g7nk3sf5s5ttg27r4cdjgpdtto@group.calendar.google.com","jlangli1@swarthmore.edu","fjl75not0nhq75hkhm2phkj67o@group.calendar.google.com"]
   //  var allCals = [CalendarApp.getCalendarById("jlangli1@swarthmore.edu"), CalendarApp.getCalendarById("swarthmore.edu_g7nk3sf5s5ttg27r4cdjgpdtto@group.calendar.google.com")]
+  var noSpacesweeksObj = {}
   var weeksObj = {}
   var spacesObj = {}
   
-  for(var i = 0; i<=13;i++){
+  for(var i = 0; i<=6;i++){
+    noSpacesweeksObj[startDateTime+msInDay*i] = {"DUE": [], "TODO":[],"allDay": [], "0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[],"13":[],"14":[],"15":[],"16":[],"17":[],"18":[],"19":[],"20":[],"21":[],"22":[],"23":[]}
     weeksObj[startDateTime+msInDay*i] = {"DUE": [], "TODO":[],"allDay": [], "0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[],"13":[],"14":[],"15":[],"16":[],"17":[],"18":[],"19":[],"20":[],"21":[],"22":[],"23":[]}
 //    spacesObj[startDateTime+msInDay*i] = {"0":"","1":"","2":"","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":""}
   }
@@ -136,12 +138,65 @@ function makePaper(startDate, body, minimizeSize) {
         var eventEndTimeTime = eventEndTime.getTime()
         Logger.log(allDays[i].getTitle())
 //        Logger.log(usedTimes[dayStart])
+//        if(eventStartTime.getDay()>=1 && eventStartTime.getDay()<6){
+//          for(var q = eventStartTimeTime; q<eventEndTimeTime;q+=60*1000){
+//            var mins = ((q-dayStart-(8*60*60*1000))/(60*1000))
+//            if(mins > 720){
+//              continue;
+//            }
+//            if(usedTimes[dayStart][mins] > neededNumSpaces){
+//              neededNumSpaces = usedTimes[dayStart][mins]
+//            }
+//            usedTimes[dayStart][mins]++
+//          }
+//        }
+//        for(var u = 1; u<=neededNumSpaces;u++){
+//          neededSpaces+="  "
+//        }
+        
+        /*if(z == 0){
+          weeksObj[dayStart][eventStartTime.getHours()].push(((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+neededSpaces+"▿"+bold(allDays[i].getTitle()))
+          weeksObj[dayEnd][(eventEndTime.getHours()).toString()].push((eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+"$"+neededSpaces+"▵"+bold(allDays[i].getTitle()))
+        }else 
+          */
+          
+        if(z==1){
+          weeksObj[dayStart].TODO.push(eventStartTime.getHours()+((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+truncate(allDays[i].getTitle(), longestLength))
+        }else if(z == 2){
+          weeksObj[dayStart].DUE.push(eventStartTime.getHours()+((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+truncate(allDays[i].getTitle(), longestLength))
+        }
+//        weeksObj[dayStart][eventStartTime.getHours()].push([((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+neededSpaces+"▿"+truncate(allDays[i].getTitle(), longestLength),
+//          [(eventEndTime.getHours()).toString(), (eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+"$"+neededSpaces+"▵"+truncate(allDays[i].getTitle(), longestLength)]
+//          ])
+//        weeksObj[dayEnd][(eventEndTime.getHours()).toString()].push((eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+"$"+neededSpaces+"▵"+truncate(allDays[i].getTitle(), longestLength))
+        
+        noSpacesweeksObj[dayStart][eventStartTime.getHours()].push([[eventStartTime, eventEndTime], truncate(allDays[i].getTitle(), longestLength)])
+        
+      }
+    }
+    
+  }
+ Logger.log(JSON.stringify(noSpacesweeksObj))
+  for(var i in noSpacesweeksObj){
+    var dayStart = i
+    for(var z = 0; z<=23;z++){
+      for(var p =0; p<noSpacesweeksObj[i][z].length;p++){
+        noSpacesweeksObj[i][z] = noSpacesweeksObj[i][z].sort(compareSecondElem)
+        eventStartTime = noSpacesweeksObj[i][z][p][0][0]
+        eventEndTime = noSpacesweeksObj[i][z][p][0][1]   
+        var eventStartTimeTime = eventStartTime.getTime()
+        var eventEndTimeTime = eventEndTime.getTime()
+        neededSpaces = ""
+        neededNumSpaces = 0
+        
+                
         if(eventStartTime.getDay()>=1 && eventStartTime.getDay()<6){
           for(var q = eventStartTimeTime; q<eventEndTimeTime;q+=60*1000){
             var mins = ((q-dayStart-(8*60*60*1000))/(60*1000))
             if(mins > 720){
               continue;
             }
+            Logger.log(mins)
             if(usedTimes[dayStart][mins] > neededNumSpaces){
               neededNumSpaces = usedTimes[dayStart][mins]
             }
@@ -151,22 +206,14 @@ function makePaper(startDate, body, minimizeSize) {
         for(var u = 1; u<=neededNumSpaces;u++){
           neededSpaces+="  "
         }
-        
-        if(z == 0){
-          weeksObj[dayStart][eventStartTime.getHours()].push(((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+neededSpaces+"▿"+bold(allDays[i].getTitle()))
-          weeksObj[dayEnd][(eventEndTime.getHours()).toString()].push((eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+"$"+neededSpaces+"▵"+bold(allDays[i].getTitle()))
-        }else if(z==1){
-          weeksObj[dayStart].TODO.push(eventStartTime.getHours()+((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+truncate(allDays[i].getTitle(), longestLength))
-        }else if(z == 2){
-          weeksObj[dayStart].DUE.push(eventStartTime.getHours()+((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+truncate(allDays[i].getTitle(), longestLength))
-        }else{
-        weeksObj[dayStart][eventStartTime.getHours()].push(((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+neededSpaces+"▿"+truncate(allDays[i].getTitle(), longestLength))
-        weeksObj[dayEnd][(eventEndTime.getHours()).toString()].push((eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+"$"+neededSpaces+"▵"+truncate(allDays[i].getTitle(), longestLength))
-        }
+        weeksObj[i][z].push(((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+neededSpaces+"▿"+noSpacesweeksObj[i][z][p][1])
+        weeksObj[i][eventEndTime.getHours()].push((eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+"$"+neededSpaces+"▵"+noSpacesweeksObj[i][z][p][1])
       }
     }
-    
   }
+  Logger.log("-----------")
+  Logger.log("-----------")
+  Logger.log(JSON.stringify(weeksObj))
   
   
   
@@ -201,14 +248,14 @@ function makePaper(startDate, body, minimizeSize) {
 ////        }
 ////      }
 //      thisDayTable[thisDayTable.length-1][1] = thisDayTable[thisDayTable.length-1][1].replace(/\n$/, "$")
-      if(thisDayTable[thisDayTable.length-1][1] == ""){
-        thisDayTable.pop()
-      }
+//      if(thisDayTable[thisDayTable.length-1][1] == ""){
+//        thisDayTable.pop()
+//      }
       for(var q = 1; q<24;q++){
         
 //        thisDayTable.push([armyToNormalTime(q), thisDayObj[q].sort().join("\n").replace(/\$/g, "$")])
         if((q >8 && q<=20)||thisDayObj[q].join("")!=""){
-          thisDayTable.push([armyToNormalTime(q), thisDayObj[q].sort(compareToSpace)
+          thisDayTable.push([armyToNormalTime(q), thisDayObj[q]//.sort(compareToSpace)
                              .join("\n").replace(/\$/g, "")])
         }
        
@@ -242,7 +289,7 @@ function makePaper(startDate, body, minimizeSize) {
       for(var q in thisDayObj){
         if(thisDayObj[q]!=""){
           numLines++
-            todaysTimes+=armyToNormalTime(q)+thisDayObj[q].sort(compareToSpace)
+            todaysTimes+=armyToNormalTime(q)+thisDayObj[q]//.sort(compareToSpace)
             .join("\n"+armyToNormalTime(q)).replace(/\$/g, "")+"\n"
         }
       }
@@ -259,7 +306,7 @@ function makePaper(startDate, body, minimizeSize) {
   for(var q in thisDayObj){
     if(thisDayObj[q]!=""){
       numLines++
-        satText+=armyToNormalTime(q)+thisDayObj[q].sort(compareToSpace)
+        satText+=armyToNormalTime(q)+thisDayObj[q]//.sort(compareToSpace)
         .join("\n"+armyToNormalTime(q)).replace(/\$/g, "")+"\n"
     }
   }
@@ -276,7 +323,7 @@ function makePaper(startDate, body, minimizeSize) {
   var thisDayObj = weeksObj[startDateTime+msInDay*6]
   for(var q in thisDayObj){
     if(thisDayObj[q]!=""){
-      sunText+=armyToNormalTime(q)+thisDayObj[q].sort(compareToSpace)
+      sunText+=armyToNormalTime(q)+thisDayObj[q]//.sort(compareToSpace)
       .join("\n"+armyToNormalTime(q)).replace(/\$/g, "")+"\n"
     }
   }
@@ -406,4 +453,8 @@ function addSpaces(startTime, endTime, write){
 
 function compareToSpace(a,b){
   return (a.substring(0, a.indexOf(" "))).localeCompare(b.substring(0, b.indexOf(" ")));
+}
+
+function compareSecondElem(a, b){
+  return (a[1]).localeCompare(b[1]);
 }
