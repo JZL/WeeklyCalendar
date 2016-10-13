@@ -94,7 +94,7 @@ function makePaper(startDate, body, minimizeSize) {
   
   for(var i = 0; i<=6;i++){
     noSpacesweeksObj[startDateTime+msInDay*i] = {"DUE": [], "TODO":[],"allDay": [], "0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[],"13":[],"14":[],"15":[],"16":[],"17":[],"18":[],"19":[],"20":[],"21":[],"22":[],"23":[]}
-    weeksObj[startDateTime+msInDay*i] = {"DUE": [], "TODO":[],"allDay": [], "0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[],"13":[],"14":[],"15":[],"16":[],"17":[],"18":[],"19":[],"20":[],"21":[],"22":[],"23":[]}
+    weeksObj[startDateTime+msInDay*i] = {"BOLD": [], "DUE": [], "TODO":[],"allDay": [], "0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[],"13":[],"14":[],"15":[],"16":[],"17":[],"18":[],"19":[],"20":[],"21":[],"22":[],"23":[]}
 //    spacesObj[startDateTime+msInDay*i] = {"0":"","1":"","2":"","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":""}
   }
   for(var z = 0; z<allCals.length;z++){
@@ -112,14 +112,15 @@ function makePaper(startDate, body, minimizeSize) {
           eventEndDate+=msInDay
         }
         for(var start = eventStartDate; start <eventEndDate; start+=msInDay){
-          if(z==0){
-            weeksObj[start].allDay.push(bold(allDays[i].getTitle()))
-          }else if(z == 1){
+          if(z == 1){
             weeksObj[start].TODO.push(truncate(allDays[i].getTitle(), 48))
           }else if(z == 2){
             weeksObj[start].DUE.push(truncate(allDays[i].getTitle(), 48))
           }else{
             //TDD
+            if(z == 0){
+              weeksObj[start].BOLD.push(["allDay",  weeksObj[start].allDay.length])
+            }
             weeksObj[start].allDay.push(allDays[i].getTitle())
           }
         }
@@ -159,18 +160,23 @@ function makePaper(startDate, body, minimizeSize) {
           weeksObj[dayEnd][(eventEndTime.getHours()).toString()].push((eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+"$"+neededSpaces+"▵"+bold(allDays[i].getTitle()))
         }else 
           */
-          
+          //last is true if want to be bold
+        noSpacesweeksObj[dayStart][eventStartTime.getHours()].push([[eventStartTime, eventEndTime], truncate(allDays[i].getTitle(), longestLength), z==0])
         if(z==1){
           weeksObj[dayStart].TODO.push(eventStartTime.getHours()+((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+truncate(allDays[i].getTitle(), longestLength))
         }else if(z == 2){
           weeksObj[dayStart].DUE.push(eventStartTime.getHours()+((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+truncate(allDays[i].getTitle(), longestLength))
         }
+        /*else if(z==0){
+          weeksObj[dayStart].BOLD.push([eventStartTime.getHours(), noSpacesweeksObj[dayStart][eventStartTime.getHours()].length-1])
+        }
+        */
 //        weeksObj[dayStart][eventStartTime.getHours()].push([((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+neededSpaces+"▿"+truncate(allDays[i].getTitle(), longestLength),
 //          [(eventEndTime.getHours()).toString(), (eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+"$"+neededSpaces+"▵"+truncate(allDays[i].getTitle(), longestLength)]
 //          ])
 //        weeksObj[dayEnd][(eventEndTime.getHours()).toString()].push((eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+"$"+neededSpaces+"▵"+truncate(allDays[i].getTitle(), longestLength))
         
-        noSpacesweeksObj[dayStart][eventStartTime.getHours()].push([[eventStartTime, eventEndTime], truncate(allDays[i].getTitle(), longestLength)])
+
         
       }
     }
@@ -196,7 +202,6 @@ function makePaper(startDate, body, minimizeSize) {
             if(mins > 720){
               continue;
             }
-            Logger.log(mins)
             if(usedTimes[dayStart][mins] > neededNumSpaces){
               neededNumSpaces = usedTimes[dayStart][mins]
             }
@@ -208,6 +213,10 @@ function makePaper(startDate, body, minimizeSize) {
         }
         weeksObj[i][z].push(((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+neededSpaces+"▿"+noSpacesweeksObj[i][z][p][1])
         weeksObj[i][eventEndTime.getHours()].push((eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+"$"+neededSpaces+"▵"+noSpacesweeksObj[i][z][p][1])
+        if(noSpacesweeksObj[i][z][p][2] == true){
+          weeksObj[i].BOLD.push([z, weeksObj[i][z].length-1])
+          weeksObj[i].BOLD.push([eventEndTime.getHours(), weeksObj[i][eventEndTime.getHours()].length-1])
+        }
       }
     }
   }
@@ -232,12 +241,15 @@ function makePaper(startDate, body, minimizeSize) {
     var thisDayTable = []
     var thisDayObj = weeksObj[startDateTime+msInDay*i]
     
+    var hoursToIndices = {}
+    
     if(!minimizeSize){
       if(thisDayObj.DUE.length !== 0 ){
         thisDayTable.push(["", "                    DUE: □ "+thisDayObj.DUE.join("\n                         □ ")])
       }
       if(thisDayObj.allDay.length !== 0){
-        thisDayTable.push(["∞", thisDayObj.allDay.join("\n")])      
+        thisDayTable.push(["∞", thisDayObj.allDay.join("\n")])   
+        hoursToIndices["allDay"] = thisDayTable.length
       }
       
 ////      thisDayTable.push(["←", ""]) 
@@ -257,6 +269,7 @@ function makePaper(startDate, body, minimizeSize) {
         if((q >8 && q<=20)||thisDayObj[q].join("")!=""){
           thisDayTable.push([armyToNormalTime(q), thisDayObj[q]//.sort(compareToSpace)
                              .join("\n").replace(/\$/g, "")])
+          hoursToIndices[q] = thisDayTable.length
         }
        
       }
@@ -282,7 +295,15 @@ function makePaper(startDate, body, minimizeSize) {
         timeTable.getCell(z, 1).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).setPaddingLeft(0)
         //      timeTable.getCell(z, 2).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).setPaddingLeft(0).setWidth(185)
       }
+      for(var q in thisDayObj.BOLD){
+        Logger.log("BOLD "+thisDayObj.BOLD[q][0]+" , "+hoursToIndices[thisDayObj.BOLD[q][0]]+" , "+thisDayObj.BOLD[q][1])
+        timeTable.getCell(hoursToIndices[thisDayObj.BOLD[q][0]]-1, 1).getChild(thisDayObj.BOLD[q][1]).asText().setBold(true)
+      }
+//      if(i==0){
+//        Logger.log("BOLD" +timeTable.getCell(5, 1).getChild(4).asText().setBold(true))
+//      }
 //      timeTable.getCell(0, 1).getChild(1).asText().setBold(true)
+      
     }else{
       var todaysTimes = ""
       var numLines = 0
