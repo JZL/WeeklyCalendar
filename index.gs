@@ -102,10 +102,12 @@ function makePaper(startDate, body, minimizeSize) {
   var weeksObj = {}
   var spacesObj = {}
   var hoursTaken = {}
+  var goalsArr = []
+  var hasGotGoals = false
   
   for(var i = 0; i<=6;i++){
     noSpacesweeksObj[startDateTime+msInDay*i] = {"DUE": [], "TODO":[],"allDay": [], "0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[],"13":[],"14":[],"15":[],"16":[],"17":[],"18":[],"19":[],"20":[],"21":[],"22":[],"23":[]}
-    weeksObj[startDateTime+msInDay*i] = {"BOLD": [], "DUE": [], "TODO":[],"allDay": [], "0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[],"13":[],"14":[],"15":[],"16":[],"17":[],"18":[],"19":[],"20":[],"21":[],"22":[],"23":[]}
+    weeksObj[startDateTime+msInDay*i] = {"GOALS": [], "BOLD": [], "DUE": [], "TODO":[],"allDay": [], "0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[],"13":[],"14":[],"15":[],"16":[],"17":[],"18":[],"19":[],"20":[],"21":[],"22":[],"23":[]}
     hoursTaken[startDateTime+msInDay*i] = {"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[],"13":[],"14":[],"15":[],"16":[],"17":[],"18":[],"19":[],"20":[],"21":[],"22":[],"23":[]}
 //    spacesObj[startDateTime+msInDay*i] = {"0":"","1":"","2":"","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":""}
   }
@@ -134,9 +136,28 @@ function makePaper(startDate, body, minimizeSize) {
             continue
           }
           if(z == 1){
-            weeksObj[start].TODO.push(title)
-            if(title.indexOf("!!")==0){
-              weeksObj[start].BOLD.push(["TODO",  weeksObj[start].TODO.length-1])
+            if(title.indexOf("::") == 0){
+              var todoTitle = []
+              var thisGoalArr = title.split("::")
+              for(var goal in thisGoalArr){
+                if(thisGoalArr[goal] == ""){
+                  continue
+                }
+                if(hasGotGoals==false){
+                  goalsArr.push(thisGoalArr[goal].split(":"))
+                }
+                todoTitle.push(thisGoalArr[goal].split(":")[0])
+              }
+              //unshift with reverse later makes repeared goals last
+              weeksObj[start].TODO.unshift(todoTitle.join(", □ "))
+              
+              hasGotGoals = true
+              
+            }else{
+              weeksObj[start].TODO.push(title)
+              if(title.indexOf("!!")==0){
+                weeksObj[start].BOLD.push(["TODO",  weeksObj[start].TODO.length-1])
+              }
             }
           }else if(z == 2){
             weeksObj[start].DUE.push(title)
@@ -344,7 +365,8 @@ function makePaper(startDate, body, minimizeSize) {
         thisDayTable.pop()
       }
       if(thisDayObj.TODO.length !== 0 ){
-        thisDayTable.push(["", "                   TODO: □ "+thisDayObj.TODO.join("\n                         □ ")])
+        //reverse makes repeared goals last
+        thisDayTable.push(["", "                   TODO: □ "+thisDayObj.TODO.reverse().join("\n                         □ ")])
         hoursToIndices["TODO"] = thisDayTable.length
       }
       var timeTable = a.getCell(Math.floor(i/2),i%2).appendTable(thisDayTable).setAttributes(style).setColumnWidth(0, 0)
@@ -413,6 +435,7 @@ function makePaper(startDate, body, minimizeSize) {
       sunText+=armyToNormalTime(q)+thisDayObj[q]//.sort(compareToSpace)
       .join("\n"+armyToNormalTime(q)).replace(/\$/g, "")+"\n"
     }
+    
   }
   
   var randFontsArr = getRandomFonts(8)
@@ -427,8 +450,24 @@ function makePaper(startDate, body, minimizeSize) {
   a.getCell(2,1).appendParagraph(satText).setAttributes(style)
   .appendHorizontalRule()
   
+  var addParagraph = ""
+    for(var o in goalsArr){
+      addParagraph+=goalsArr[o][0]+" |"
+      for(var i = 1; i<=7;i++){
+        if(i == parseInt(goalsArr[o][1])){
+          addParagraph+=i+"   ❚"
+        }else{
+          addParagraph+=i+" |"
+        }
+      }
+      addParagraph+="\n"
+    }
+  
   a.getCell(2,1).appendParagraph("Sun "+getDateString(new Date(startDateTime+6*msInDay))).setAlignment(DocumentApp.HorizontalAlignment.CENTER).editAsText().setFontSize(11).setFontFamily(randFontsArr[7])
-  a.getCell(2,1).appendParagraph(sunText).setAttributes(style)
+   a.getCell(2,1).appendParagraph(sunText).setAttributes(style)
+   a.getCell(2,1).appendParagraph("").setAlignment(DocumentApp.HorizontalAlignment.RIGHT).appendText(addParagraph).setFontSize(11).setFontFamily("Droid Sans Mono")
+//   a.getCell(2,1)
+//   .setAlignment(DocumentApp.HorizontalAlignment.RIGHT).appendParagraph(addParagraph).editAsText().setFontSize(11).setFontFamily("Droid Sans Mono")
   
 //  a.getCell(0, 0).getChild(0).asText().setFontFamily(getRandomFont())
   
@@ -456,6 +495,7 @@ function makePaper(startDate, body, minimizeSize) {
   //  .setBorderColor("#FFFFFF")
   //  .getRow(0).getCell(0).setWidth(553).getChild(0).asParagraph().setAlignment(DocumentApp.HorizontalAlignment.CENTER)
   if(!minimizeSize){
+    
     body.appendParagraph("Books Out      Add Dates\t").setAlignment(DocumentApp.HorizontalAlignment.RIGHT).setSpacingBefore(0).editAsText().setFontFamily(randFontsArr[8])
 //    body.appendParagraph("Books Out\t\t\tAdd Dates").setAlignment(DocumentApp.HorizontalAlignment.RIGHT).editAsText().setFontFamily(randFontsArr[9])
   }
