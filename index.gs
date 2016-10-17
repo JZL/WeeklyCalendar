@@ -452,7 +452,7 @@ function makePaper(startDate, body, minimizeSize) {
   
   var addParagraph = ""
     for(var o in goalsArr){
-      addParagraph+=goalsArr[o][0]+" |"
+      addParagraph+=goalsArr[o][0]+" __ |"
       for(var i = 1; i<=7;i++){
         if(i == parseInt(goalsArr[o][1])){
           addParagraph+=i+"   ❚"
