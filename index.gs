@@ -247,6 +247,7 @@ function makePaper(startDate, body, minimizeSize) {
         }
         
         noSpacesweeksObj[dayStart][eventStartTime.getHours()].push([[eventStartTime, eventEndTime], truncateTitle, (z==0 || title.indexOf("!!")==0)])
+//        noSpacesweeksObj[dayStart][eventEndTime.getHours()].push([[eventStartTime, eventEndTime], truncateTitle, (z==0 || title.indexOf("!!")==0)])
         
         
         //for use to decide if empty hour for " |"
@@ -311,16 +312,13 @@ function makePaper(startDate, body, minimizeSize) {
           //          neededSpaces+="  "
           neededSpaces+="  "
         }
-        weeksObj[i][z].push(((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+neededSpaces+"▿"+noSpacesweeksObj[i][z][p][1])
-        weeksObj[i][eventEndTime.getHours()].push((eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+"$"+neededSpaces+"▵"+noSpacesweeksObj[i][z][p][1])
-        if(noSpacesweeksObj[i][z][p][2] == true){
-          if(z == eventEndTime.getHours()){
-            weeksObj[i].BOLD.push([z, weeksObj[i][z].length-2, "normal: "+noSpacesweeksObj[i][z][p][1]])
-          }else{
-            weeksObj[i].BOLD.push([z, weeksObj[i][z].length-1, , "normal: "+noSpacesweeksObj[i][z][p][1]])
-          }
-          weeksObj[i].BOLD.push([eventEndTime.getHours(), weeksObj[i][eventEndTime.getHours()].length-1, , "normal: "+noSpacesweeksObj[i][z][p][1]])
-        }
+        weeksObj[i][z].push([((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+neededSpaces+"▿"+noSpacesweeksObj[i][z][p][1],noSpacesweeksObj[i][z][p][2]])
+        weeksObj[i][eventEndTime.getHours()].push([(eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+neededSpaces+"▵"+noSpacesweeksObj[i][z][p][1], noSpacesweeksObj[i][z][p][2]])
+        
+//        weeksObj[i][z] = weeksObj[i][z].sort()
+//        weeksObj[i][eventEndTime.getHours()] = weeksObj[i][eventEndTime.getHours()].sort()
+        
+        
         for(var e = eventStartTime.getHours()+1; e<eventEndTime.getHours();e++){
           if(hoursTaken[i][e].length == 0){
             weeksObj[i][e].push("  |")
@@ -334,6 +332,32 @@ function makePaper(startDate, body, minimizeSize) {
     //        weeksObj[i][z].splice(0,1)
     //      }
     //    }
+  }
+  
+  
+//          if(noSpacesweeksObj[i][z][p][2] == true){
+//          if(z == eventEndTime.getHours()){
+//            weeksObj[i].BOLD.push([z, weeksObj[i][z].length-2, "normal: "+noSpacesweeksObj[i][z][p][1]])
+//          }else{
+//            weeksObj[i].BOLD.push([z, weeksObj[i][z].length-1, , "normal: "+noSpacesweeksObj[i][z][p][1]])
+//          }
+//          
+//          //if modify this, modify the push to eventEndTime.getHours() :(
+//          Logger.log("looking for "+(eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+neededSpaces+"▵"+noSpacesweeksObj[i][z][p][1]+" in "+JSON.stringify(weeksObj[i][eventEndTime.getHours()]))
+//          //weeksObj[i].BOLD.push([eventEndTime.getHours(), weeksObj[i][eventEndTime.getHours()].length-1, , "normal: "+noSpacesweeksObj[i][z][p][1]])
+//          weeksObj[i].BOLD.push([eventEndTime.getHours(), weeksObj[i][eventEndTime.getHours()].indexOf(endTitle) , "normal: "+noSpacesweeksObj[i][z][p][1]])
+//        }
+  for(var i in weeksObj){
+    for(var z=0; z<=23;z++){
+      Logger.log(weeksObj[i][z])
+      weeksObj[i][z] = weeksObj[i][z].sort()
+      for(var q in weeksObj[i][z]){
+        if(weeksObj[i][z][q][1] == true){
+          weeksObj[i].BOLD.push([z, q])
+        }
+        weeksObj[i][z][q] = weeksObj[i][z][q][0]
+      }
+    }
   }
   //  Logger.log("-----------")
   //  Logger.log("-----------")
@@ -356,6 +380,11 @@ function makePaper(startDate, body, minimizeSize) {
     var boldedEvents = []
     var thisDayTable = []
     var thisDayObj = weeksObj[addDaysTime(startDate, i)]
+//    var thisDayObj = []
+//    for(var q =0; q<weeksObjPlusBold.length;q++){
+////      thisDayObj.push(weeksObjPlusBold[q][0])
+//    }
+    
     
     var hoursToIndices = {}
     
