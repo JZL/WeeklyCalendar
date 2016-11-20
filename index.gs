@@ -26,7 +26,7 @@ function doAll(emailNow){
   body.getChild(0).asText().setFontSize(11)//.setFontFamily(getRandomFont())
   var thisMonday = getMonday(new Date())
   Logger.log(thisMonday.getTime())
-  var thisMonday = getMonday(new Date("11/5/2016"))
+//  var thisMonday = getMonday(new Date("11/5/2016"))
   //true means want to NOT minimize size
   
   makePaper(thisMonday, body, false)
@@ -35,8 +35,8 @@ function doAll(emailNow){
   body.getChild(0).asText().setFontSize(0)
   Logger.log("--------------")
   //    Logger.log(getMonday(addDaysDate(thisMonday, 6*msInDay)))
-  //  makePaper(getMonday(addDaysDate(thisMonday, 6)), body, true)
-  //  makePaper(thisMonday, body, true)
+  makePaper(getMonday(addDaysDate(thisMonday, 6)), body, true)
+//  makePaper(thisMonday, body, true)
   
   Utilities.sleep(1000)
   if(emailNow == false){
@@ -174,7 +174,11 @@ function makePaper(startDate, body, minimizeSize) {
                 Logger.log("aa")
               }
               weeksObj[start].TODO.unshift(todoTitle.join(", □ "))
-              
+              for(var w in weeksObj[start].BOLD){
+                if(weeksObj[start].BOLD[w][0] == "TODO"){
+                  weeksObj[start].BOLD[w][1]++
+                }
+              }
               hasGotGoals = true
               
             }else{
@@ -435,6 +439,13 @@ function makePaper(startDate, body, minimizeSize) {
         //reverse makes repeared goals last
         thisDayTable.push(["", "                                   TODO: □ "+thisDayObj.TODO.reverse().join("\n                                         □ ")])
         hoursToIndices["TODO"] = thisDayTable.length
+        for(var w in thisDayObj.BOLD){
+          Logger.log("asd")
+          if(thisDayObj.BOLD[w][0] == "TODO"){
+            //bc reverse array, need to reverse bold indexes
+            thisDayObj.BOLD[w][1] = thisDayObj.TODO.length-thisDayObj.BOLD[w][1]-1
+          }
+        }
       }
       var timeTable = a.getCell(Math.floor(i/2),i%2).appendTable(thisDayTable).setAttributes(style).setColumnWidth(0, 0)
       //      timeTable.getCell(0, 0).editAsText().setBold(true)
@@ -445,7 +456,10 @@ function makePaper(startDate, body, minimizeSize) {
       }
       for(var q in thisDayObj.BOLD){
         Logger.log("BOLD "+thisDayObj.BOLD[q][0]+" , "+hoursToIndices[thisDayObj.BOLD[q][0]]+" , "+thisDayObj.BOLD[q][1])
-        timeTable.getCell(hoursToIndices[thisDayObj.BOLD[q][0]]-1, 1).getChild(thisDayObj.BOLD[q][1]).asText().setBold(true).setFontSize(7)
+        var cell = timeTable.getCell(hoursToIndices[thisDayObj.BOLD[q][0]]-1, 1).getChild(thisDayObj.BOLD[q][1]).asText().setBold(true).setFontSize(7)
+        if(thisDayObj.BOLD[q][0] == "TODO"){
+          cell.setFontSize(6)
+        }
       }
       //      if(i==0){
       //        Logger.log("BOLD" +timeTable.getCell(5, 1).getChild(4).asText().setBold(true))
