@@ -18,15 +18,17 @@ function doAll(emailNow){
   var document = DocumentApp.openById("1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU")
   var body = document.getBody().clear()
   body.setMarginTop(0)
+//  body.setMarginBottom(28.8)
   body.setMarginBottom(28.8)
   //  body.setMarginLeft(28.8)
   body.setMarginLeft(0)
-  body.setMarginRight(5)
+  body.setMarginRight(0)
+  body.setAttributes({FOREGROUND_COLOR:"#000000"})
   //resets font size  
   body.getChild(0).asText().setFontSize(11)//.setFontFamily(getRandomFont())
   var thisMonday = getMonday(new Date())
   Logger.log(thisMonday.getTime())
-//  var thisMonday = getMonday(new Date("11/5/2016"))
+//  var thisMonday = getMonday(new Date("11/25/2016"))
   //true means want to NOT minimize size
   
   makePaper(thisMonday, body, false)
@@ -83,6 +85,7 @@ function makePaper(startDate, body, minimizeSize) {
   var hoursTaken = {}
   var goalsArr = []
   var hasGotGoals = false
+  var todoTitle = []
   for(var w = 0; w<=6; w++){
     var todayTime = addDaysTime(startDate, w)
     usedTimes[todayTime] = []
@@ -97,8 +100,7 @@ function makePaper(startDate, body, minimizeSize) {
   }
   
   a = body.appendTable([["Mon "+getDateString(startDate), "Tue "+getDateString(addDaysDate(startDate, 1))], ["Wed "+getDateString(addDaysDate(startDate, 2)), "Thur "+getDateString(addDaysDate(startDate, 3))], ["Fri "+getDateString(addDaysDate(startDate, 4)), "Sat "+getDateString(addDaysDate(startDate, 5))]])
-  .setBorderColor("#FFFFFF")
-  
+  .setBorderColor("#000000")//.setColumnWidth(1, 270)
   
   if(minimizeSize){
     a.setBorderColor("#000000");
@@ -129,10 +131,16 @@ function makePaper(startDate, body, minimizeSize) {
     var allDays = allCals[z].getEvents(startDate, addDaysDate(startDateTime, 7))
     Logger.log(allDays)
     for(var i in allDays){
+      Logger.log(allDays[i].getTitle())
+      if(allDays[i].getTitle() == "Cornell: Scheduled Exams End (Fall)"){
+      Logger.log("aa")
+      }
       if(allDays[i].isAllDayEvent()){
         var eventStartDate = allDays[i].getAllDayStartDate()
         var eventEndDate = allDays[i].getAllDayEndDate()
-        if(eventStartDate == eventEndDate){
+        Logger.log(eventStartDate.getTime())
+        Logger.log(eventEndDate.getTime())
+        if(eventStartDate.getTime() == eventEndDate.getTime()){
           //needed to have multiday all day not go over and single day showup
           eventEndDate  = addDaysDate(eventEndDate, 1)
         }
@@ -157,21 +165,19 @@ function makePaper(startDate, body, minimizeSize) {
           //          }
           if(z == 1){
             if(title.indexOf("::") == 0){
-              var todoTitle = []
               var thisGoalArr = title.split("::")
               for(var goal in thisGoalArr){
                 if(thisGoalArr[goal] == ""){
                   continue
                 }
-                if(hasGotGoals==false){
+//                if(hasGotGoals==false){
                   goalsArr.push(thisGoalArr[goal].split(":"))
-                }
+//                }
                 todoTitle.push(thisGoalArr[goal].split(":")[0])
               }
               //unshift with reverse later makes repeared goals last
               if(weeksObj[start] == null){
-                Logger.log("start: "+start+"  "+weeksObj[start])
-                Logger.log("aa")
+//                Logger.log("start: "+start+"  "+weeksObj[start])
               }
               weeksObj[start].TODO.unshift(todoTitle.join(", □ "))
               for(var w in weeksObj[start].BOLD){
@@ -190,7 +196,7 @@ function makePaper(startDate, body, minimizeSize) {
           }else if(z == 2){
             weeksObj[start].DUE.push(title)
             if(title.indexOf("!!")==0){
-              weeksObj[start].DUE.push(["DUE",  weeksObj[start].DUE.length-1])
+              weeksObj[start].BOLD.push(["DUE",  weeksObj[start].DUE.length-1])
             }
           }else{
             weeksObj[start].allDay.push(title)
@@ -212,7 +218,7 @@ function makePaper(startDate, body, minimizeSize) {
         var neededSpaces = ""
         var eventStartTimeTime = eventStartTime.getTime()
         var eventEndTimeTime = eventEndTime.getTime()
-        Logger.log(allDays[i].getTitle())
+//        Logger.log(allDays[i].getTitle())
         //        Logger.log(usedTimes[dayStart])
         //        if(eventStartTime.getDay()>=1 && eventStartTime.getDay()<6){
         //          for(var q = eventStartTimeTime; q<eventEndTimeTime;q+=60*1000){
@@ -247,7 +253,7 @@ function makePaper(startDate, body, minimizeSize) {
         
         
         if(noSpacesweeksObj[dayStart] == null){
-          Logger.log("@@@@@@@"+allDays[i].getTitle()+" "+new Date(eventStartTime))
+//          Logger.log("@@@@@@@"+allDays[i].getTitle()+" "+new Date(eventStartTime))
         }
         
         noSpacesweeksObj[dayStart][eventStartTime.getHours()].push([[eventStartTime, eventEndTime], truncateTitle, (z==0 || title.indexOf("!!")==0)])
@@ -282,12 +288,12 @@ function makePaper(startDate, body, minimizeSize) {
   for(var i in noSpacesweeksObj){
     var dayStart = i
     for(var z = 0; z<=23;z++){
-      Logger.log("sort"+JSON.stringify(noSpacesweeksObj[i][z]))
+//      Logger.log("sort"+JSON.stringify(noSpacesweeksObj[i][z]))
       noSpacesweeksObj[i][z] = noSpacesweeksObj[i][z].sort(compareSecondElem)
       for(var p =0; p<noSpacesweeksObj[i][z].length;p++){
-        Logger.log( noSpacesweeksObj[i][z][p][0][0])
-        Logger.log( noSpacesweeksObj[i][z][p][0][1])
-        Logger.log("------")
+//        Logger.log( noSpacesweeksObj[i][z][p][0][0])
+//        Logger.log( noSpacesweeksObj[i][z][p][0][1])
+//        Logger.log("------")
         eventStartTime = noSpacesweeksObj[i][z][p][0][0]
         eventEndTime = noSpacesweeksObj[i][z][p][0][1]   
         var eventStartTimeTime = eventStartTime.getTime()
@@ -297,7 +303,7 @@ function makePaper(startDate, body, minimizeSize) {
         neededSpaces = ""
         neededNumSpaces = 0
         
-        Logger.log("running "+(eventStartTimeTime))
+//        Logger.log("running "+(eventStartTimeTime))
         //        if(eventStartTime.getDay()>=1 && eventStartTime.getDay()<6){
         for(var q = eventStartTimeTime; q<eventEndTimeTime;q+=60*1000){
           //            var q = new Date(new Date(b).setHours(0,0,0,0)).getTime()
@@ -322,12 +328,16 @@ function makePaper(startDate, body, minimizeSize) {
 //        weeksObj[i][z] = weeksObj[i][z].sort()
 //        weeksObj[i][eventEndTime.getHours()] = weeksObj[i][eventEndTime.getHours()].sort()
         
-        
+//        Logger.log("hours"+(eventStartTime.getHours()+1)+", "+eventEndTime.getHours())
         for(var e = eventStartTime.getHours()+1; e<eventEndTime.getHours();e++){
-          if(hoursTaken[i][e].length == 0){
-            weeksObj[i][e].push("  |")
+//          Logger.log("hour "+e)
+//          Logger.log("length "+hoursTaken[i][e].length)
+//          if(hoursTaken[i][e].length == 0){
+//          Logger.log(weeksObj[i][e])
+          weeksObj[i][e].push(["  |"])
+//            Logger.log(weeksObj[i][e])
             hoursTaken[i][e].push("|")
-          }
+//          }
         }
       }
     }
@@ -353,7 +363,7 @@ function makePaper(startDate, body, minimizeSize) {
 //        }
   for(var i in weeksObj){
     for(var z=0; z<=23;z++){
-      Logger.log(weeksObj[i][z])
+//      Logger.log(weeksObj[i][z])
       weeksObj[i][z] = weeksObj[i][z].sort()
       for(var q in weeksObj[i][z]){
         if(weeksObj[i][z][q][1] == true){
@@ -384,6 +394,7 @@ function makePaper(startDate, body, minimizeSize) {
     var boldedEvents = []
     var thisDayTable = []
     var thisDayObj = weeksObj[addDaysTime(startDate, i)]
+    thisDayObj.TODO.push(todoTitle.join(", □ "))
 //    var thisDayObj = []
 //    for(var q =0; q<weeksObjPlusBold.length;q++){
 ////      thisDayObj.push(weeksObjPlusBold[q][0])
@@ -424,7 +435,7 @@ function makePaper(startDate, body, minimizeSize) {
         
       }
       //      thisDayTable.push(["→", ""])
-      Logger.log(thisDayTable.length)
+//      Logger.log(thisDayTable.length)
       //      for(var q = 21; q<24; q++){
       //        if(thisDayObj[q]!=""){
       //          thisDayTable[thisDayTable.length-1][1]+=armyToNormalTime(q)+thisDayObj[q].sort().join("\n"+armyToNormalTime(q)).replace(/\$/g, "$")+"\n"
@@ -440,12 +451,14 @@ function makePaper(startDate, body, minimizeSize) {
         thisDayTable.push(["", "                                   TODO: □ "+thisDayObj.TODO.reverse().join("\n                                         □ ")])
         hoursToIndices["TODO"] = thisDayTable.length
         for(var w in thisDayObj.BOLD){
-          Logger.log("asd")
           if(thisDayObj.BOLD[w][0] == "TODO"){
             //bc reverse array, need to reverse bold indexes
             thisDayObj.BOLD[w][1] = thisDayObj.TODO.length-thisDayObj.BOLD[w][1]-1
           }
         }
+      }
+      if(thisDayObj.DUE.length !== 0){
+        hoursToIndices["DUE"] = 1
       }
       var timeTable = a.getCell(Math.floor(i/2),i%2).appendTable(thisDayTable).setAttributes(style).setColumnWidth(0, 0)
       //      timeTable.getCell(0, 0).editAsText().setBold(true)
@@ -454,7 +467,11 @@ function makePaper(startDate, body, minimizeSize) {
         timeTable.getCell(z, 1).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).setPaddingLeft(0)
         //      timeTable.getCell(z, 2).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).setPaddingLeft(0).setWidth(185)
       }
+      Logger.log(thisDayObj.BOLD)
       for(var q in thisDayObj.BOLD){
+        if(thisDayObj.BOLD[q][0] == "DUE"){
+          Logger.log("")
+        }
         Logger.log("BOLD "+thisDayObj.BOLD[q][0]+" , "+hoursToIndices[thisDayObj.BOLD[q][0]]+" , "+thisDayObj.BOLD[q][1])
         var cell = timeTable.getCell(hoursToIndices[thisDayObj.BOLD[q][0]]-1, 1).getChild(thisDayObj.BOLD[q][1]).asText().setBold(true).setFontSize(7)
         if(thisDayObj.BOLD[q][0] == "TODO"){
@@ -470,6 +487,9 @@ function makePaper(startDate, body, minimizeSize) {
       var todaysTimes = ""
       var numLines = 0
       for(var q in thisDayObj){
+        if(q == "BOLD"){
+          continue;
+        }
         var spaces = ""
         if(i%2 == 0){
           spaces = "    " 
@@ -479,6 +499,7 @@ function makePaper(startDate, body, minimizeSize) {
         if(thisDayObj[q]!=""){
           numLines++
             //2 spaces so can have 0 left margin
+//            delete thisDayObj[q].BOLD
             todaysTimes+=spaces+armyToNormalTime(q, true)+thisDayObj[q]//.sort(compareToSpace)
             .join("\n"+spaces+armyToNormalTime(q, true)).replace(/\$/g, "")+"\n"
         }
@@ -500,10 +521,19 @@ function makePaper(startDate, body, minimizeSize) {
     }
     if(thisDayObj[q]!=""){
       numLines++
-        satText+=armyToNormalTime(q)+thisDayObj[q]//.sort(compareToSpace)
-        .join("\n"+armyToNormalTime(q)).replace(/\$/g, "")+"\n"
+        
+//        if(thisDayObj[q].toString().substr(-1) == "|" && (armyToNormalTime(q) == "11"||armyToNormalTime(q) == "12")){
+//          thisDayObj[q] = thisDayObj[q].toString().replace("__", "_")
+//        }
+//        satText+=(armyToNormalTime(q)+thisDayObj[q]//.sort(compareToSpace)
+//        .join("\n"+armyToNormalTime(q)).replace(/\$/g, "")).replace("12  |", "12 |").replace("11  |", "11 |")+"\n"
+        
+        satText+=(" "+armyToNormalTime(q)+thisDayObj[q]//.sort(compareToSpace)
+        .join("\n"+" "+armyToNormalTime(q)).replace(/\$/g, "")).replace(" 12", "12").replace(" 11", "11").replace(" 10", "10")+"\n"
+        
     }
   }
+  satText+="□ "+todoTitle.join(", □ ")
   if(minimizeSize){
     for(var i =numLines; i<4; i++){
       satText+="\n"
@@ -520,8 +550,7 @@ function makePaper(startDate, body, minimizeSize) {
       continue
     }
     if(thisDayObj[q]!=""){
-      sunText+=armyToNormalTime(q)+thisDayObj[q]//.sort(compareToSpace)
-      .join("\n"+armyToNormalTime(q)).replace(/\$/g, "")+"\n"
+      sunText+=(armyToNormalTime(q)+thisDayObj[q].join("\n"+armyToNormalTime(q)).replace(/\$/g, "")).replace("12  |", "12 |").replace("11  |", "11 |").replace("10  |", "10 |")+"\n"
     }
     
   }
@@ -589,8 +618,29 @@ function makePaper(startDate, body, minimizeSize) {
   //  .getRow(0).getCell(0).setWidth(553).getChild(0).asParagraph().setAlignment(DocumentApp.HorizontalAlignment.CENTER)
   if(!minimizeSize){
     
-    body.appendParagraph("Books Out      Add Dates\t").setAlignment(DocumentApp.HorizontalAlignment.RIGHT).setSpacingBefore(0).editAsText().setFontFamily(randFontsArr[8])
+    body.appendParagraph("Add Dates\t").setAlignment(DocumentApp.HorizontalAlignment.RIGHT).setSpacingBefore(0).editAsText().setFontFamily(randFontsArr[8])
     //    body.appendParagraph("Books Out\t\t\tAdd Dates").setAlignment(DocumentApp.HorizontalAlignment.RIGHT).editAsText().setFontFamily(randFontsArr[9])
+  }else{
+    var monad = ".  "
+    var poly = ""
+    var metaPoly = ""
+    for(var i=0; i<59;i++){
+      poly+=monad
+    }
+    poly = poly.replace(/\s*$/, "")
+    for(var i = 0; i<=40;i++){
+      metaPoly+=poly+"\n"
+    }
+//    body.appendParagraph(metaPoly).setSpacingBefore(0).editAsText().setForegroundColor("#551a8b")
+    var a = body.getChild(body.getNumChildren()-1).asText().setFontSize(0)
+    body.appendParagraph(metaPoly).setSpacingBefore(0).getChild(0).asText().setAttributes({FONT_SIZE:11, FOREGROUND_COLOR:"#808080", FONT_FAMILY:"Courier New"})
+//    body.getChild(body.getNumChildren()-1).asText()
+//    .setAttributes({FONT_SIZE:11, FOREGROUND_COLOR:"#808080", FONT_FAMILY:"Courier New"})
+    //{FONT_SIZE=11, ITALIC=null, HORIZONTAL_ALIGNMENT=Left, INDENT_END=0.0, INDENT_START=0.0, LINE_SPACING=1.15, LINK_URL=null, UNDERLINE=null, BACKGROUND_COLOR=null, INDENT_FIRST_LINE=0.0, LEFT_TO_RIGHT=true, SPACING_BEFORE=0.0, HEADING=Normal, SPACING_AFTER=0.0, STRIKETHROUGH=null, FOREGROUND_COLOR=#000000, BOLD=null, FONT_FAMILY=Courier New}
+
+//    .setAttributes({FONT_SIZE:11, LINE_SPACING:1.15, SPACING_BEFORE:0.0, FOREGROUND_COLOR:"#808080"})
+//    a.editAsText().setAttributes({FONT_SIZE:11, LINE_SPACING:1.15, SPACING_BEFORE:0.0, FOREGROUND_COLOR:"#551a8b"})
+//    .setAttributes({FONT_SIZE=11, ITALIC=null, STRIKETHROUGH=null, BORDER_COLOR=#000000, FOREGROUND_COLOR=null, BOLD=null, LINK_URL=null, UNDERLINE=null, FONT_FAMILY=null, BACKGROUND_COLOR=null, BORDER_WIDTH=1.0})
   }
   
   
