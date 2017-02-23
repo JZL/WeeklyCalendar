@@ -21,14 +21,14 @@ function doAll(emailNow){
 //  body.setMarginBottom(28.8)
   body.setMarginBottom(28.8)
   //  body.setMarginLeft(28.8)
-  body.setMarginLeft(0)
+  body.setMarginLeft(15)
   body.setMarginRight(0)
   body.setAttributes({FOREGROUND_COLOR:"#000000"})
   //resets font size  
   body.getChild(0).asText().setFontSize(11)//.setFontFamily(getRandomFont())
   var thisMonday = getMonday(new Date())
   Logger.log(thisMonday.getTime())
-//  var thisMonday = getMonday(new Date("11/25/2016"))
+//  var thisMonday = getMonday(new Date("1/20/2017"))
   //true means want to NOT minimize size
   
   makePaper(thisMonday, body, false)
@@ -42,13 +42,13 @@ function doAll(emailNow){
   
   Utilities.sleep(1000)
   if(emailNow == false){
-    MailApp.sendEmail({
-      to: "jlangli1@swarthmore.edu",
-      subject: "New Weekly Cal",
-      htmlBody: "<a href='https://docs.google.com/document/d/1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU/edit'>gDoc</a><br><a href='https://docs.google.com/a/swarthmore.edu/document/export?format=pdf&id=1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU'>PDF</a>",
-      //wasn't updating
-      //      attachments: [DocumentApp.openById("1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU").getAs('application/pdf')]
-    });
+//    MailApp.sendEmail({
+//      to: "jlangli1@swarthmore.edu",
+//      subject: "New Weekly Cal",
+//      htmlBody: "<a href='https://docs.google.com/document/d/1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU/edit'>gDoc</a><br><a href='https://docs.google.com/a/swarthmore.edu/document/export?format=pdf&id=1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU'>PDF</a>",
+//      //wasn't updating
+//      //      attachments: [DocumentApp.openById("1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU").getAs('application/pdf')]
+//    });
   }
   //   MailApp.sendEmail("jlangli1@swarthmore.edu", "New Weekly Calendar", "https://docs.google.com/document/d/1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU/edit \n https://docs.google.com/a/swarthmore.edu/document/export?format=pdf&id=1t5SK5nrz4DrpN0Ryjv3fpzLwjgUL62jExbV3RUM6acU")
   //  }catch(e){
@@ -75,9 +75,9 @@ function makePaper(startDate, body, minimizeSize) {
   var startDateTime = startDate.getTime()
   var usedTimes = {};
   
-  //unusual, TODO on, DUEDates, schedule, jlangli1, days off
+  //unusual, TODO on, DUEDates, schedule, jlangli1, days off, SCCS Schedule
   //keep order of first 3
-  var allCals = ["swarthmore.edu_dop0bh53409lheq23ell6ignqk@group.calendar.google.com", "swarthmore.edu_d4fd5qnh3r5a7aqdc2hk9fk5ag@group.calendar.google.com", "swarthmore.edu_ji5sie4fh0ddijtuithbqdse28@group.calendar.google.com", "swarthmore.edu_g7nk3sf5s5ttg27r4cdjgpdtto@group.calendar.google.com","jlangli1@swarthmore.edu","fjl75not0nhq75hkhm2phkj67o@group.calendar.google.com", "en.judaism#holiday@group.v.calendar.google.com"]
+  var allCals = ["swarthmore.edu_dop0bh53409lheq23ell6ignqk@group.calendar.google.com", "swarthmore.edu_d4fd5qnh3r5a7aqdc2hk9fk5ag@group.calendar.google.com", "swarthmore.edu_ji5sie4fh0ddijtuithbqdse28@group.calendar.google.com", "swarthmore.edu_g7nk3sf5s5ttg27r4cdjgpdtto@group.calendar.google.com","jlangli1@swarthmore.edu","fjl75not0nhq75hkhm2phkj67o@group.calendar.google.com", "en.judaism#holiday@group.v.calendar.google.com","swarthmore.edu_0ha19taudgvpckfmel7okbq6ic@group.calendar.google.com"]
   //  var allCals = [CalendarApp.getCalendarById("jlangli1@swarthmore.edu"), CalendarApp.getCalendarById("swarthmore.edu_g7nk3sf5s5ttg27r4cdjgpdtto@group.calendar.google.com")]
   var noSpacesweeksObj = {}
   var weeksObj = {}
@@ -132,9 +132,6 @@ function makePaper(startDate, body, minimizeSize) {
     Logger.log(allDays)
     for(var i in allDays){
       Logger.log(allDays[i].getTitle())
-      if(allDays[i].getTitle() == "Cornell: Scheduled Exams End (Fall)"){
-      Logger.log("aa")
-      }
       if(allDays[i].isAllDayEvent()){
         var eventStartDate = allDays[i].getAllDayStartDate()
         var eventEndDate = allDays[i].getAllDayEndDate()
@@ -322,8 +319,8 @@ function makePaper(startDate, body, minimizeSize) {
           //          neededSpaces+="  "
           neededSpaces+="  "
         }
-        weeksObj[i][z].push([((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+neededSpaces+"▿"+noSpacesweeksObj[i][z][p][1],noSpacesweeksObj[i][z][p][2]])
-        weeksObj[i][eventEndTime.getHours()].push([(eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+neededSpaces+"▵"+noSpacesweeksObj[i][z][p][1], noSpacesweeksObj[i][z][p][2]])
+        weeksObj[i][z].push([((eventStartTime.getMinutes() == 0)? ':00 ' : ':'+eventStartTime.getMinutes()+" ")+neededSpaces+"▽"+noSpacesweeksObj[i][z][p][1],noSpacesweeksObj[i][z][p][2]])
+        weeksObj[i][eventEndTime.getHours()].push([(eventEndTime.getMinutes() == 0? ':00 ' : ':'+eventEndTime.getMinutes()+" ")+neededSpaces+"△"+noSpacesweeksObj[i][z][p][1], noSpacesweeksObj[i][z][p][2]])
         
 //        weeksObj[i][z] = weeksObj[i][z].sort()
 //        weeksObj[i][eventEndTime.getHours()] = weeksObj[i][eventEndTime.getHours()].sort()
@@ -460,7 +457,7 @@ function makePaper(startDate, body, minimizeSize) {
       if(thisDayObj.DUE.length !== 0){
         hoursToIndices["DUE"] = 1
       }
-      var timeTable = a.getCell(Math.floor(i/2),i%2).appendTable(thisDayTable).setAttributes(style).setColumnWidth(0, 0)
+      var timeTable = a.getCell(Math.floor(i/2),i%2).appendTable(thisDayTable).setAttributes(style).setColumnWidth(0, 8)
       //      timeTable.getCell(0, 0).editAsText().setBold(true)
       for(var z = 0; z<thisDayTable.length;z++){
         timeTable.getCell(z, 0).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).setPaddingLeft(0).getChild(0).asParagraph().setAlignment(DocumentApp.HorizontalAlignment.RIGHT)
@@ -624,11 +621,11 @@ function makePaper(startDate, body, minimizeSize) {
     var monad = ".  "
     var poly = ""
     var metaPoly = ""
-    for(var i=0; i<59;i++){
+    for(var i=0; i<57;i++){
       poly+=monad
     }
     poly = poly.replace(/\s*$/, "")
-    for(var i = 0; i<=40;i++){
+    for(var i = 0; i<=38;i++){
       metaPoly+=poly+"\n"
     }
 //    body.appendParagraph(metaPoly).setSpacingBefore(0).editAsText().setForegroundColor("#551a8b")
