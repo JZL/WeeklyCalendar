@@ -37,7 +37,7 @@ function doAll(emailNow){
   body.getChild(0).asText().setFontSize(0)
   Logger.log("--------------")
   //    Logger.log(getMonday(addDaysDate(thisMonday, 6*msInDay)))
-  makePaper(getMonday(addDaysDate(thisMonday, 6)), body, true)
+//  makePaper(getMonday(addDaysDate(thisMonday, 6)), body, true)
 //  makePaper(thisMonday, body, true)
   
   Utilities.sleep(1000)
@@ -107,12 +107,12 @@ function makePaper(startDate, body, minimizeSize) {
     //    a.setBorderColor("#D3D3D3");
   }else{
     a.setBorderColor("#D3D3D3")
+    var parsedSharp = parseSharp()
   }
   
   //  for(var i=0, i<=2; i++){
   for(var i=0;i<=2; i++){
-    a.getCell(i, 0).getChild(0).asParagraph().setAlignment(DocumentApp.HorizontalAlignment.CENTER)
-    a.getCell(i, 1).getChild(0).asParagraph().setAlignment(DocumentApp.HorizontalAlignment.CENTER)
+    a.getCell(i, 0).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).getChild(0).asParagraph().setAlignment(DocumentApp.HorizontalAlignment.CENTER)
   }
   //  
   
@@ -331,7 +331,7 @@ function makePaper(startDate, body, minimizeSize) {
 //          Logger.log("length "+hoursTaken[i][e].length)
 //          if(hoursTaken[i][e].length == 0){
 //          Logger.log(weeksObj[i][e])
-          weeksObj[i][e].push(["  |"])
+          weeksObj[i][e].push(["      |"])
 //            Logger.log(weeksObj[i][e])
             hoursTaken[i][e].push("|")
 //          }
@@ -384,7 +384,7 @@ function makePaper(startDate, body, minimizeSize) {
   //  style[DocumentApp.Attribute.FONT_FAMILY] = 'Roboto Mono';
   style[DocumentApp.Attribute.FONT_FAMILY] = 'Droid Sans Mono';
   style[DocumentApp.Attribute.BORDER_COLOR] = '#FFFFFF';
-  //  style[DocumentApp.Attribute.BORDER_COLOR] = '#000000';
+//  style[DocumentApp.Attribute.BORDER_COLOR] = '#000000';
   
   for(var i=0; i<=4;i++){
     
@@ -445,7 +445,7 @@ function makePaper(startDate, body, minimizeSize) {
       }
       if(thisDayObj.TODO.length !== 0 ){
         //reverse makes repeared goals last
-        thisDayTable.push(["", "                                   TODO: □ "+thisDayObj.TODO.reverse().join("\n                                         □ ")])
+        thisDayTable.push(["", "    TODO: □ "+thisDayObj.TODO.reverse().join("\n          □ ")])
         hoursToIndices["TODO"] = thisDayTable.length
         for(var w in thisDayObj.BOLD){
           if(thisDayObj.BOLD[w][0] == "TODO"){
@@ -457,13 +457,32 @@ function makePaper(startDate, body, minimizeSize) {
       if(thisDayObj.DUE.length !== 0){
         hoursToIndices["DUE"] = 1
       }
-      var timeTable = a.getCell(Math.floor(i/2),i%2).appendTable(thisDayTable).setAttributes(style).setColumnWidth(0, 8)
-      //      timeTable.getCell(0, 0).editAsText().setBold(true)
-      for(var z = 0; z<thisDayTable.length;z++){
-        timeTable.getCell(z, 0).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).setPaddingLeft(0).getChild(0).asParagraph().setAlignment(DocumentApp.HorizontalAlignment.RIGHT)
-        timeTable.getCell(z, 1).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).setPaddingLeft(0)
-        //      timeTable.getCell(z, 2).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).setPaddingLeft(0).setWidth(185)
+//      for(var pq in thisDayTable){
+//        thisDayTable[pq].push("aa")
+//      }
+      var outerTimeTable = a.getCell(Math.floor(i/2),i%2).appendTable([["", parsedSharp[i+1]||"Nothing to see hear"]]).setFontSize(0).setAttributes(style).setColumnWidth(0, 205)
+      var sidePanelStyle = {};
+      sidePanelStyle[DocumentApp.Attribute.FONT_FAMILY] = 'Poiret One';
+      sidePanelStyle[DocumentApp.Attribute.FONT_SIZE] = 5;
+      outerTimeTable.getCell(0,1).setAttributes(sidePanelStyle)
+//      outerTimeTable.getCell(0,0).setFontSize(0)
+      
+      var timeTable = outerTimeTable.getCell(0,0).appendTable(thisDayTable).setAttributes(style).setColumnWidth(0, 8)
+      outerTimeTable.getCell(0,0).setFontSize(0)
+//      Logger.log(timeTable.getNumChildren())
+      var numTimeChildren = timeTable.getNumChildren()
+      for(var timeChild = 0; timeChild<numTimeChildren;timeChild++){
+        timeTable.getChild(timeChild).setFontSize(6)
       }
+      //      timeTable.getCell(0, 0).editAsText().setBold(true)
+      //tdd
+//      outerTimeTable.getCell(0,0).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).(0)
+//      outerTimeTable.getCell(0,1).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).(0)
+//      for(var z = 0; z<thisDayTable.length;z++){
+//        timeTable.getCell(z, 0).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).(0).getChild(0).asParagraph().setAlignment(DocumentApp.HorizontalAlignment.RIGHT)
+//        timeTable.getCell(z, 1).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).(0)
+//        //      timeTable.getCell(z, 2).setPaddingBottom(0).setPaddingTop(0).setPaddingRight(0).(0).setWidth(185)
+//      }
       Logger.log(thisDayObj.BOLD)
       for(var q in thisDayObj.BOLD){
         if(thisDayObj.BOLD[q][0] == "DUE"){
@@ -562,7 +581,8 @@ function makePaper(startDate, body, minimizeSize) {
   a.getCell(2, 1).getChild(0).asText().setFontFamily(randFontsArr[5])
   a.getCell(0, 0).getChild(0).asText().setFontFamily(randFontsArr[6])
   a.getCell(2,1).appendParagraph(satText).setAttributes(style)
-  .appendHorizontalRule()
+  a.getCell(2,1).appendParagraph(parsedSharp[6]).asText().setFontFamily("Poiret One").setFontSize(5)
+  a.getCell(2,1).appendHorizontalRule()
   
   var addParagraph = ""
   var subscriptArr = ["","₁","₂","₃","₄","₅","₆","₇","₈","₉"]
@@ -582,6 +602,7 @@ function makePaper(startDate, body, minimizeSize) {
   
   a.getCell(2,1).appendParagraph("Sun "+getDateString(addDaysDate(startDate, 6))).setAlignment(DocumentApp.HorizontalAlignment.CENTER).editAsText().setFontSize(11).setFontFamily(randFontsArr[7])
   a.getCell(2,1).appendParagraph(sunText).setAttributes(style)
+  a.getCell(2,1).appendParagraph(parsedSharp[0]).asText().setFontFamily("Poiret One").setFontSize(5)
   if(!minimizeSize){
     a.getCell(2,1).appendParagraph("").setAlignment(DocumentApp.HorizontalAlignment.RIGHT).appendText(addParagraph).setFontSize(9).setFontFamily("Droid Sans Mono")
   }
@@ -792,6 +813,50 @@ function daysBetween(startDate, endDate) {
   return (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay;
 }
 
-function getSharples(){
+function parseSharp() {
+  var url = "https://dash.swarthmore.edu/weekly-menu"
+  var url = "https://dash.swarthmore.edu/calendar/1768/2017-W09"
+  var escapeMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '`': '&#x60;',
+    ' ': '&nbsp;'
+  }
+  
+  for(var i in escapeMap){
+    escapeMap[i] = new RegExp(escapeMap[i], "g")
+  }
+  var atom = XmlService.getNamespace('http://www.w3.org/2005/Atom');
+  var resp = UrlFetchApp.fetch(url).getContentText()
+  var a = resp.match(/<div class="event-time">[\s\S]*?<h6>/g)
+  for(var i in a){
+    a[i] = a[i].replace(/<.*?>/g, "").replace(/[\s\S]*Lunch/, "Lunch").replace(/^\s*/gm, "").replace(/\s*$/gm, "").replace(/pm$/gm, "pm@").replace("Dinner", "@Dinner").replace(/[\r\n]/g, " | ").replace(/@/gm, "\n").replace(/^\s*\|\s*|\s*\|\s*$/gm, "").replace("Dinner", "\nDinner")
+    if(a[i].indexOf("Brunch")!=-1){
+      a[i] = a[i].replace(/[\s\S]*Dinner/m, "\r\n\r\nDinner")
+    }
+    for(var z in escapeMap){
+      a[i] = a[i].replace(escapeMap[z], z)
+    }
+    Logger.log(a[i])
+    Logger.log("----")
+  }
+  a[0]+="\nSu-EM: 6:30 - 10p"
+    //Monday
+  a[1]+="\nM-EM: 8 - 12p"
+    //Tueday
+  a[2]+="\nT-EM: 8 - 12p"
+  //Wedday
+  a[3]+="\nW-EM: 8 - 12p"
+    //Thurday
+  a[4]+="\nR-EM: 8 - 10p"
+    //Friday
+  a[5]+="\nF-EM: 8 - 10p"
+  //Sat Not += bc usually not there
+  a[6]+="Sa-EM: 6:30 - 10p"
+    //Sunday
 
+  return a
 }
